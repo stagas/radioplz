@@ -1,0 +1,13 @@
+source code for radioplz.com
+
+      made in node.js
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+fork it, have fun, send pull :)
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+installing dependencies:
+
+npm install scylla paperboy

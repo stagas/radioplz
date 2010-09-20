@@ -1,0 +1,140 @@
+body {
+margin:0;
+padding:0;
+font-family:Tahoma;
+color:#333;
+}
+
+#container {
+width:80%;
+padding:20px 0;
+margin:0 auto;
+}
+
+#suggest {
+width:100%;
+}
+
+#suggestForm {
+float:left;
+width:100%;
+}
+
+.formRow {
+position:relative;
+float:left;
+width:100%;
+clear:both;
+padding:10px 0
+}
+
+label {
+float:left;
+width:19%;
+text-align:right;
+padding-right:1%;
+line-height:24px;
+}
+
+input[type=text] {
+float:left;
+width:60%;
+font-family:Tahoma;
+font-size:14px;
+height:1.5em;
+line-height:1.5em;
+}
+
+.formHelp {
+left:-100px;
+height:1em;
+float:left;
+clear:both;
+width:100%;
+color:#999;
+font-size:11px;
+}
+
+.formError {
+display:block;
+opacity:0.0;
+margin:0;
+padding:5px 0px 0 0;
+color:#D74;
+float:left;
+clear:both;
+width:100%;
+font-size:11px;
+text-align:right;
+}
+
+#formSubmit {
+margin:20px auto 0 auto;
+padding:5px 20px 8px 20px;
+font-size:20px;
+display:block;
+}
+
+#suggestList {
+float:left;
+width:100%;
+padding:0;
+margin:0px 0;
+}
+.station {
+margin:0 0 20px 0;
+padding:20px 0;
+width:100%;
+float:left;
+clear:both;
+border-bottom:1px solid #BBB;
+}
+.station .vote {
+float:left;
+text-align:center;
+font-size:60px;
+width:10%;
+}
+.station .vote button {
+font-size:11px;
+padding:0;
+}
+.station .voted {
+color:#E94;
+}
+.station .info {
+position:relative;
+float:left;
+padding-top:25px;
+width:90%;
+font-size:20px;
+}
+.station .info .lbl {
+color:#999;
+float:left;
+text-align:right;
+width:15%;
+padding-right:2%;
+clear:both;
+}
+.station .info .val {
+width:82%;
+float:left;
+}
+.station .info .by {
+position:absolute;
+right:0;
+bottom:-20px;
+font-size:12px;
+}
+#note {
+clear:both;
+font-size:18px;
+padding:20px 30px;
+background:#ddd;
+display:block;
+width:70%;
+text-align:center;
+line-height:1.7em;
+margin:35px auto 0px auto;
+}
