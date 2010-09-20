@@ -14,7 +14,7 @@ DEBUG = true
 var HOST = process.env.POLLA_HOST || 'localhost'
   , PORT = process.env.POLLA_PORT || 80
   , PUBLIC = path.join(path.dirname(__filename), '../public')
-  , SITENAME = 'Radio'
+  , SITENAME = 'Radioplz.com'
   , banTime = 1 * 10 * 1000
   , minDiff = 5 * 1000
   , maxDiff = 20 * 1000
@@ -81,7 +81,7 @@ stats = []
 WebServer.prototype = scylla.beget(
   {
     'GET /removesuggest/(.*)': function(req, res, matches) {
-      var ip = req.headers.ip    
+      var ip = req.headers.ip || req.connection.remoteAddress
         , allowed = '79.107.123.157'
         
       if (ip == allowed) {
@@ -103,7 +103,7 @@ WebServer.prototype = scylla.beget(
       }
     }
   , 'GET /voteup/(.*)': function(req, res, matches) {
-      var ip = req.headers.ip
+      var ip = req.headers.ip || req.connection.remoteAddress
       log(matches[1])
       suggest.get(matches[1], function(err, doc, meta) {
         if (err) { throw err }
@@ -129,7 +129,7 @@ WebServer.prototype = scylla.beget(
       })
     }
   , 'GET /suggest/': function(req, res) {
-      var ip = req.headers.ip  
+      var ip = req.headers.ip || req.connection.remoteAddress
       suggest.all(function(doc, meta) {
         return true       
       }, function(err, docs, metas) {
@@ -165,7 +165,7 @@ WebServer.prototype = scylla.beget(
           , formSuccess = false
           , formInfo = []
           , formErrors = []
-          , ip = req.headers.ip
+          , ip = req.headers.ip || req.connection.remoteAddress
           , nick = ''
           , stationName = ''
           , email = ''
@@ -235,7 +235,7 @@ WebServer.prototype = scylla.beget(
      }
     
   , 'GET /t/(.*)': function(req, res, matches) {  
-      var ip = req.headers.ip
+      var ip = req.headers.ip || req.connection.remoteAddress
       
       if (typeof users[ip] == 'undefined') {
         var dat = new Date()
@@ -354,8 +354,8 @@ WebServer.prototype = scylla.beget(
   
     // Paperboy serving static files
   , 'GET /(.*)': function (req, res) {
-      var ip = req.headers.ip
-      logs(req.headers)
+      var ip = req.headers.ip || req.connection.remoteAddress
+      //log(ip)
       
       paperboy
         .deliver(PUBLIC, req, res)
