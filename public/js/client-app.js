@@ -371,7 +371,7 @@ function another() {
       $.each(stats, function(k, v) {
         if (rw < v.m && r == -1) {
           for (var i=0, ilen = radios.length; i<ilen; i++) {
-            if (radios[i].id == v.r && !hist.hasObject(i)) { 
+            if (radios[i].id == k && !hist.hasObject(i)) { 
               r = i
               break
             }

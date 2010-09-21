@@ -7,12 +7,12 @@ var sys = require('sys')
   , http = require('http')
   , scylla = require('scylla')  
   , paperboy = require('paperboy')
-  , nStore = require('./nstore/lib/nstore')
+  , fs = require('fs')
 
 // Configuration
 DEBUG = true 
 var HOST = process.env.POLLA_HOST || 'localhost'
-  , PORT = process.env.POLLA_PORT || 80
+  , PORT = process.env.POLLA_PORT || 8080
   , PUBLIC = path.join(path.dirname(__filename), '../public')
   , SITENAME = 'Radioplz.com'
   , banTime = 1 * 10 * 1000
@@ -21,8 +21,17 @@ var HOST = process.env.POLLA_HOST || 'localhost'
   , meter = 5 * 1000
   
 // Init DB
-var radios = nStore(path.join(path.dirname(__filename), 'radios.db'))
-  , suggest = nStore(path.join(path.dirname(__filename), 'suggest.db'))
+var radiosFile = path.join(path.dirname(__filename), 'radios.db')
+  , suggestFile = path.join(path.dirname(__filename), 'suggest.db')
+  , radios = {}
+  , suggest = []
+
+try {
+  radios = JSON.parse(fs.readFileSync(radiosFile, 'utf8'))
+} catch(err) {}
+try {
+  suggest = JSON.parse(fs.readFileSync(suggestFile, 'utf8'))
+} catch(err) {}
 
 // Initialize Variables
 var uid = 0
@@ -85,17 +94,16 @@ WebServer.prototype = scylla.beget(
         , allowed = '79.107.123.157'
         
       if (ip == allowed) {
-        suggest.remove(matches[1], function(err, docs, meta) {
-          if (err) { 
-            res.writeHead(200, { 'Content-Type': 'text/plain' })
-            res.end('Doesnt exist')
-          }
+        if (typeof suggest[matches[1]] !== 'undefined') {
+          delete suggest[matches[1]]
           log('Removed item ' + matches[1])
-          log(docs)
-          log(meta)
+          log(suggest)
           res.writeHead(200, { 'Content-Type': 'text/plain' })
           res.end('OK done')
-        })
+        } else {
+          res.writeHead(200, { 'Content-Type': 'text/plain' })
+          res.end('Doesnt exist')
+        }
       } else {
         var statCode = 404
         res.writeHead(statCode, {'Content-Type': 'text/html'})
@@ -105,54 +113,50 @@ WebServer.prototype = scylla.beget(
   , 'GET /voteup/(.*)': function(req, res, matches) {
       var ip = req.headers.ip || req.connection.remoteAddress
       log(matches[1])
-      suggest.get(matches[1], function(err, doc, meta) {
-        if (err) { throw err }
-        if (typeof doc.voted == 'undefined') doc.voted = []
-        if (!doc.voted.hasObject(ip)) {
-          doc.voted.push(ip)
-          doc.votes++
-          suggest.save(matches[1], doc, function(err) {
-            if (err) { throw err }
-            var json = JSON.stringify({success: true})
-            res.writeHead(200, { 'Content-Type': 'application/json'
-                               , 'Content-Length': json.length
-                               })
-            res.end(json)
-          })
-        } else {
-          var json = JSON.stringify({success: false, info: 'Already voted'})
-          res.writeHead(200, { 'Content-Type': 'application/json'
-                             , 'Content-Length': json.length
-                             })
-          res.end(json)          
-        }
-      })
-    }
-  , 'GET /suggest/': function(req, res) {
-      var ip = req.headers.ip || req.connection.remoteAddress
-      suggest.all(function(doc, meta) {
-        return true       
-      }, function(err, docs, metas) {
-        if (err) throw err
-        
-        var newdocs = []
-
-        for (var i=0, ilen = docs.length; i<ilen; i++) {
-          newdocs.push({ key: metas[i].key
-                       , station: docs[i].station
-                       , url: docs[i].url
-                       , nick: docs[i].nick
-                       , votes: docs[i].votes
-                       , voted: (docs[i].voted.hasObject(ip)) ? true : false
-                       })
-        }
-
-        var json = JSON.stringify(newdocs)
+      if (typeof suggest[matches[1]].voted !== 'undefined') {
+        suggest[matches[1]].voted = []
+      }
+      if (!suggest[matches[1]].voted.hasObject(ip)) {
+        suggest[matches[1]].voted.push(ip)
+        suggest[matches[1]].votes++
+        fs.writeFile(suggestFile, JSON.stringify(suggest))
+        var json = JSON.stringify({success: true})
         res.writeHead(200, { 'Content-Type': 'application/json'
                            , 'Content-Length': json.length
                            })
         res.end(json)
-      })
+      } else {
+        var json = JSON.stringify({success: false, info: 'Already voted'})
+        res.writeHead(200, { 'Content-Type': 'application/json'
+                           , 'Content-Length': json.length
+                           })
+        res.end(json)          
+      }
+    }
+  , 'GET /suggest/': function(req, res) {
+      var ip = req.headers.ip || req.connection.remoteAddress
+
+      var newdocs = []
+
+      var v
+      
+      for (var i=0; i<suggest.length; i++) {
+        v = suggest[i]
+        newdocs.push({ key: i
+                     , station: v.station
+                     , url: v.url
+                     , nick: v.nick
+                     , votes: v.votes
+                     , voted: (v.voted.hasObject(ip)) ? true : false
+                     })
+      }
+
+      var json = JSON.stringify(newdocs)
+      res.writeHead(200, { 'Content-Type': 'application/json'
+                         , 'Content-Length': json.length
+                         })
+      res.end(json)
+
     }
     
   , 'POST /suggest/': function(req, res) {
@@ -204,26 +208,24 @@ WebServer.prototype = scylla.beget(
         }
         
         if (email.length && url.length && stationName.length && nick.length) {
-
-          suggest.all(function(doc, meta) {
-            return (doc.ip == ip || doc.email == email)
-            
-          }, function(err, docs, metas) {
-            if (err) throw err
-            
-            if (docs.length < 3) {        
-              suggest.save(null, {station: stationName, url: url, nick: nick, email: email, votes: 1, ip: ip, voted: [ip]}, function(err) {
-                if (err) { throw err }
-                formInfo.push('Thank you for helping us find more quality radio stations! You can suggest ' + (3 - docs.length - 1) + ' more if you want!')
-                formSuccess = true
-                sendReply()
-              })
-            } else {            
-              formInfo.push('Thank you for your interest in '+ SITENAME +'! You already suggested 3 stations, which is the maximum.')
-              sendReply()              
-            }
-            
-          })
+          var docs = []
+          var v
+          
+          for (var i=0; i<suggest.length; i++) {
+            v = suggest[i]
+            if (ip === v.ip || email === v.email) docs.push(v)
+          }
+  
+          if (docs.length < 3) {        
+            suggest.push({station: stationName, url: url, nick: nick, email: email, votes: 1, ip: ip, voted: [ip]})
+            fs.writeFile(suggestFile, JSON.stringify(suggest))
+            formInfo.push('Thank you for helping us find more quality radio stations! You can suggest ' + (3 - docs.length - 1) + ' more if you want!')
+            formSuccess = true
+            sendReply()
+          } else {            
+            formInfo.push('Thank you for your interest in '+ SITENAME +'! You already suggested 3 stations, which is the maximum.')
+            sendReply()              
+          }
           
         } else {
         
@@ -275,33 +277,20 @@ WebServer.prototype = scylla.beget(
         logip(ip, 'Tuned to: ' + matches[1])
         var current = matches[1]
         if (current.length >= 4 && current.length <= 50) {
-          radios.get(current, function(err, doc, meta) {
-            if (err) {
-              radios.save(current, {r: current, m: 1}, function(err) {
-                if (err) { throw err }
-                res.writeHead(200, { 'Content-Type': 'text/plain'
-                                   , 'Content-Length': 0
-                                   , 'Connection': 'close'
-                                   })
-                res.end('')
-                users[ip].l = dateNow
-                users[ip].c = current
-              })
-            } else {
-              doc.m += Math.floor(dateDiff / meter)
-              log('New m: ' + doc.m + ' (added ' + Math.floor(dateDiff / meter) + ')')
-              radios.save(current, {r: current, m: doc.m}, function(err) {
-                if (err) { throw err }
-                res.writeHead(200, { 'Content-Type': 'text/plain'
-                                   , 'Content-Length': 0
-                                   , 'Connection': 'close'
-                                   })
-                res.end('')
-                users[ip].l = dateNow
-                users[ip].c = current
-              })
-            }
-          })
+          if (typeof radios[current] === 'undefined') radios[current] = { m:1, l:0 }
+          
+          radios[current].m += Math.floor(dateDiff / meter)
+          
+          fs.writeFile(radiosFile, JSON.stringify(radios))
+        
+          res.writeHead(200, { 'Content-Type': 'text/plain'
+                             , 'Content-Length': 0
+                             , 'Connection': 'close'
+                             })
+          res.end('')
+          users[ip].l = dateNow
+          users[ip].c = current
+
         } else {
           logip(ip, 'Not good size: ' + matches[1])
           res.writeHead(500, { 'Content-Type': 'text/plain'
@@ -324,32 +313,24 @@ WebServer.prototype = scylla.beget(
     }
     
   , 'GET /s/(.*)': function (req, res, matches) {
-      radios.all(function(doc, meta) {
-        return true
-      }, function(err, docs, metas) {
-        if (err) throw err
+      if (matches[1] == 'details') {
+        var dateNow = new Date()
         
-        if (matches[1] == 'details') {
-          var dr
-            , dateNow = new Date()
-          
-          for (var i=0, ilen=docs.length; i<ilen; i++) {
-            dr = docs[i].r
-            docs[i].l = 0
-            for (ip in users) {
-              if (users[ip].c == dr && dateNow - users[ip].l < maxDiff) {
-                docs[i].l++
-              }
+        for (var k in radios) {
+          radios[k].l = 0
+          for (ip in users) {
+            if (users[ip].c == k && dateNow - users[ip].l < maxDiff) {
+              radios[k].l++
             }
           }
         }
-        
-        var json = JSON.stringify(docs)
-        res.writeHead(200, { 'Content-Type': 'application/json'
-                           , 'Content-Length': json.length
-                           })
-        res.end(json)
-      })
+      }
+      console.log(radios)
+      var json = JSON.stringify(radios)
+      res.writeHead(200, { 'Content-Type': 'application/json'
+                         , 'Content-Length': json.length
+                         })
+      res.end(json)
     }
   
     // Paperboy serving static files
