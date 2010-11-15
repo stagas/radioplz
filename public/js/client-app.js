@@ -2,7 +2,34 @@
 
 $(function (){
 
+if (!Array.prototype.indexOf) {
+  Array.prototype.indexOf = function (obj, fromIndex) {
+    if (fromIndex == null) {
+        fromIndex = 0;
+    } else if (fromIndex < 0) {
+        fromIndex = Math.max(0, this.length + fromIndex);
+    }
+    for (var i = fromIndex, j = this.length; i < j; i++) {
+        if (this[i] === obj)
+            return i;
+    }
+    return -1;
+  };
+}
+
 var radios = getRadios()
+
+var favorites = $.cookie('favorites')
+if (!favorites) {
+  favorites = ''
+}
+favorites = favorites.split('|')
+var favobj = {}
+for (var i=favorites.length; i--; ) {
+  favobj[favorites[i]] = true
+}
+
+populateFav()
 
 // Init
 var hash
@@ -16,7 +43,7 @@ var stats = {}
 
 $.ajax({
   type: 'GET'
-, url: '/s/'
+, url: '/s/details'
 , success: function(msg) {
     if (msg.length) stats = msg
     $.each(stats, function(k, v) {
@@ -46,7 +73,9 @@ function logRadio() {
 var logTimeout
 
 soundManager.onload = function() {
-  checkHash()
+  setTimeout(function() {
+    checkHash()
+  }, 400)
 }
 
 soundManager.url = 'js/sm2/soundmanager2_flash9.swf'
@@ -171,7 +200,7 @@ function scale(rad, amnt,t,s,callback) {
   if (callback) callback()
   //repeatFunc(function() { doScale(rad, amnt) }, t, s, callback) 
 }
-scale(0,1,0)
+//scale(0,1,0)
 
 function opacity(amnt,t,s,callback) {
   repeatFunc(function() { doOpac(amnt) }, t, s, callback)
@@ -211,6 +240,7 @@ var current = -1
   , radid='nothing'
   , oldradid=''
   , currentSound
+  , vol = 70
 
 function play() {
 
@@ -227,7 +257,7 @@ function play() {
       id: radios[current].id
     , url: radios[current].url
     , bufferTime: 1
-    , volume: 100
+    , volume: vol
     , usePeakData: true
     })
 
@@ -242,10 +272,10 @@ function play() {
     
     if (!noZoom) {
       if (oldradid !== 'nothing') {
-        scale(oldradid,-20,10,1,function() {
+        //scale(oldradid,-20,10,1,function() {
           paintName()
           scrollToCurrent(800)
-        })
+        //})
       } else {
         paintName()
         scrollToCurrent(800)
@@ -264,7 +294,7 @@ function paintName() {
     
     var lastX = $('.item:last').position().left
     
-    $('<div class="item l s" id="'+ radid + '">' + radios[current].name + '</div>')
+    $('<div class="item l s" id="'+ radid + '">' + radios[current].name + '<span class="heart'+ ((typeof favobj[radid] !== 'undefined') ? ' selected' : '' ) +'">&hearts;</span></div>')
       .css('left', (lastX + viewW) + 'px')
       .appendTo("#name")
   }
@@ -278,8 +308,9 @@ function scrollToCurrent(speed) {
     
       var posX = $('#' + radid).position().left
 
-      $("#namewrap").animate({scrollLeft: Math.floor(posX)}, speed, function() {
-        if (speed) scale(radid,20,10,1)
+      $namewrap.animate({scrollLeft: Math.floor(posX)}, speed, function() {
+        //if (speed) scale(radid,20,10,1)
+        //$('#favwrap').css({left: posX + 'px'})
       })
       
     } catch(err) {
@@ -544,6 +575,108 @@ function checkHash() {
 function uncheckHash() {
   clearInterval(checkHashInterval)
 }
+
+var $dropdown = $('#dropdown')
+  , $namewrap = $('#namewrap')
+  , $wrap = $('#wrap')
+  , offsetY = $wrap.offset().top
+  , heightY = $wrap.outerHeight()
+  , mouseX = 0
+  , velX = 0
+  , pageX = 0
+  , followInterval = null
+  , isOverDown = false
+
+$('html').bind('mousemove', function(e) {
+  pageX = e.pageX-20
+  heightY = $wrap.outerHeight()
+  if (e.pageY > offsetY && e.pageY < offsetY + heightY + 40) {
+    $dropdown.stop(1,1).show('fast')
+    $dropdown.css({left: mouseX + 'px', top: (offsetY + heightY + 6) + 'px'})
+    if (!followInterval) followInterval = setInterval(function() {
+      velX += ((pageX-mouseX) * 0.08)
+      mouseX += velX
+      velX *= 0.55
+      $dropdown.css({left: mouseX + 'px', top: (offsetY + heightY + 6) + 'px'})  
+    }, 1000/60)    
+  } else {
+    clearInterval(followInterval)
+    followInterval = null
+    $dropdown.stop(1,1).hide('fast')
+  }
+})
+
+$('.heart').live('click', function() {
+  if (!$(this).hasClass('selected')) {
+    $(this).addClass('selected')
+    var id = $(this).parent().attr('id')
+    if (typeof favobj[id] === 'undefined') {
+      favorites.push(id)
+      favobj[id] = true
+      $.cookie('favorites', favorites.join('|'), {expires: 730})
+      populateFav()
+    }
+  } else {
+    $(this).removeClass('selected')
+    var id = $(this).parent().attr('id')
+    
+    if (typeof favobj[id] !== 'undefined') {
+      favorites.splice(favorites.indexOf(id),1)
+      delete favobj[id]
+      $.cookie('favorites', favorites.join('|'), {expires: 730})
+      populateFav()
+    }
+
+  }
+})
+
+
+$dropdown.click(function() {
+  $(this).hide()
+  if (!$(this).hasClass('opened')) {
+    $(this).addClass('opened')
+    $wrap.animate({'height': '1em'}, 'slow')
+  } else {
+    $(this).removeClass('opened')  
+    $wrap.animate({'height': '0.3em'}, 'slow')
+  }
+})
+
+var favoffY
+  , favy
+  , favh
+  
+function populateFav() {
+  var html = ''
+  for (var i=0; i<favorites.length; i++) {
+    var name = ''
+      , id = favorites[i].split('_').join('-')
+      
+    for (var r in radios) {
+      if (radios[r].id == id) name = radios[r].name
+    }
+    html += '<div class="fav"><a href="#' + id + '">' + name + '</a></div>'
+  }
+  $('#fav').html(html)
+  favoffY = $('#favwrap').offset().top
+  favy = $('#favwrap').height()
+  favh = $('#fav').outerHeight(true)
+}
+
+$('#favwrap').mousemove(function(e) {
+  var y = e.pageY
+  $(this).scrollTop(Math.floor(
+    ((y - (favoffY + 30)) / (favy - 60)) * (favh - favy)
+  ))
+})
+
+$('body').mousewheel(function(e, d) {
+  vol += (d * 4)
+  if (vol > 100) vol = 100
+  if (vol < 0) vol = 0
+
+  currentSound.setVolume(vol)
+})
 
 ;(function() {
   var n1='gsta'

@@ -1,7 +1,15 @@
 @font-face {
-	font-family: 'ChunkFiveRegular';
-	src: url('/css/Chunkfive-webfont.eot');
-	src: local('βΊ'), url('/css/Chunkfive-webfont.woff') format('woff'), url('/css/Chunkfive-webfont.ttf') format('truetype'), url('/css/Chunkfive-webfont.svg#webfont4CzPTNtF') format('svg');
+	font-family: 'Magenta';
+	src: url('/css/Magenta_BBT-webfont.eot');
+	src: local('Î²ÂÎ'), url('/css/Magenta_BBT-webfont.woff') format('woff'), url('/css/Magenta_BBT-webfont.ttf') format('truetype'), url('/css/Magenta_BBT-webfont.svg#webfontC73RpQVM') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'LaconicLight';
+	src: url('/css/Laconic_Light-webfont.eot');
+	src: local('Î²ÂÎ'), url('/css/Laconic_Light-webfont.woff') format('/css/woff'), url('/css/Laconic_Light-webfont.ttf') format('truetype'), url('/css/Laconic_Light-webfont.svg#webfont8dnoupMg') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -9,96 +17,7 @@
 @font-face {
 	font-family: 'BonvenoCFLight';
 	src: url('BonvenoCF-Light-webfont.eot');
-	src: local('βΊ'), url('/css/BonvenoCF-Light-webfont.woff') format('woff'), url('/css/BonvenoCF-Light-webfont.ttf') format('truetype'), url('/css/BonvenoCF-Light-webfont.svg#webfont6de6LVW5') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'WCWunderbachBtaDemiBold';
-	src: url('WC_Wunderbach-webfont.eot');
-	src: local('βΊ'), url('WC_Wunderbach-webfont.woff') format('woff'), url('WC_Wunderbach-webfont.ttf') format('truetype'), url('WC_Wunderbach-webfont.svg#webfont6X8R3WSt') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'WCWunderbachRoundedRegular';
-	src: url('WC_Wunderbach_R-webfont.eot');
-	src: local('βΊ'), url('WC_Wunderbach_R-webfont.woff') format('woff'), url('WC_Wunderbach_R-webfont.ttf') format('truetype'), url('WC_Wunderbach_R-webfont.svg#webfontueHk08Hm') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'WCWunderbachRoughBtaRegular';
-	src: url('WC_Wunderbach_Rough_Bta-webfont.eot');
-	src: local('βΊ'), url('WC_Wunderbach_Rough_Bta-webfont.woff') format('woff'), url('WC_Wunderbach_Rough_Bta-webfont.ttf') format('truetype'), url('WC_Wunderbach_Rough_Bta-webfont.svg#webfontmVXgSx3C') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'WCWunderbachMixBtaRegular';
-	src: url('WC_Wunderbach_Mix-webfont.eot');
-	src: local('βΊ'), url('WC_Wunderbach_Mix-webfont.woff') format('woff'), url('WC_Wunderbach_Mix-webfont.ttf') format('truetype'), url('WC_Wunderbach_Mix-webfont.svg#webfontt0wXp76W') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'WCWunderbachRoundedRegular';
-	src: url('WC_Wunderbach_R-webfont.eot');
-	src: local('βΊ'), url('WC_Wunderbach_R-webfont.woff') format('woff'), url('WC_Wunderbach_R-webfont.ttf') format('truetype'), url('WC_Wunderbach_R-webfont.svg#webfontueHk08Hm') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'WCWunderbachBtaDemiBold';
-	src: url('WC_Wunderbach-webfont.eot');
-	src: local('βΊ'), url('WC_Wunderbach-webfont.woff') format('woff'), url('WC_Wunderbach-webfont.ttf') format('truetype'), url('WC_Wunderbach-webfont.svg#webfont6X8R3WSt') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'WCWunderbachRoughBtaRegular';
-	src: url('WC_Wunderbach_Rough_Bta-webfont.eot');
-	src: local('βΊ'), url('WC_Wunderbach_Rough_Bta-webfont.woff') format('woff'), url('WC_Wunderbach_Rough_Bta-webfont.ttf') format('truetype'), url('WC_Wunderbach_Rough_Bta-webfont.svg#webfontmVXgSx3C') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-
-@font-face {
-	font-family: 'BlackoutMidnight';
-	src: url('Blackout-Midnight-webfont.eot');
-	src: local('βΊ'), url('Blackout-Midnight-webfont.woff') format('woff'), url('Blackout-Midnight-webfont.ttf') format('truetype'), url('Blackout-Midnight-webfont.svg#webfont8qch85AE') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'Blackout2AM';
-	src: url('Blackout-2am-webfont.eot');
-	src: local('βΊ'), url('Blackout-2am-webfont.woff') format('woff'), url('Blackout-2am-webfont.ttf') format('truetype'), url('Blackout-2am-webfont.svg#webfonta8YaIXkW') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-
-@font-face {
-	font-family: 'JustOldFashionRegular';
-	src: url('JustOldFashion-webfont.eot');
-	src: local('βΊ'), url('JustOldFashion-webfont.woff') format('woff'), url('JustOldFashion-webfont.ttf') format('truetype'), url('JustOldFashion-webfont.svg#webfontKfBbAVYK') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'ripe';
-	src: url('/css/ripe.otf');
+	src: local('Î²ÂÎ'), url('/css/BonvenoCF-Light-webfont.woff') format('woff'), url('/css/BonvenoCF-Light-webfont.ttf') format('truetype'), url('/css/BonvenoCF-Light-webfont.svg#webfont6de6LVW5') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }

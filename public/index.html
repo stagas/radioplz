@@ -12,6 +12,7 @@
 	<!-- Fetch scripts -->
 	<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
 	
 	<script type="text/javascript" src="js/sm2/soundmanager2-nodebug-jsmin.js"></script>
 
@@ -21,20 +22,6 @@
 </head>
 
 <body>
-
-<div id="header">
-	<div id="logowrap">
-		<h1 id="logo">Radio<span id="plz">plz</span></h1>
-		<strong id="tagline">just</strong>
-	</div>
-</div>
-
-<div id="namewrap">
-	<div id="name">
-		<div class="item">&nbsp;</div>
-	</div>
-</div>
-
 <div id="player">
 	<button id="scan">SCAN</button>
 	<!--
@@ -45,6 +32,39 @@
 	-->
 </div>
 
+<div id="wrap">
+  <div id="namewrap">
+    <div id="name">
+      <div class="item">&nbsp;</div>
+    </div>
+  </div>
+  <div id="favwrap">
+    <div id="fav">
+      <div class="fav" id="cslay">Slay</div>
+      <div class="fav" id="cdigitally-imported-minimal">Digitally Imported - Minimal</div>
+    </div>
+  </div>  
+</div>
+
+<div id="header">
+	<div id="logowrap">
+		<h1 id="logo">radio <span id="plz">plz</span></h1>
+		<strong id="tagline">just</strong>
+	</div>
+</div>
+
+<div class="row">
+	<div id="position_container">
+		<div id="position_box"></div>
+		<div id="position_fill"></div>
+		<button id="position_drag" class="control">|||</button>
+	</div><!-- #position_container -->
+</div><!-- .row -->
+
+<div id="dropdown"></div>
+
+
+
 <!--
 <div id="share">
 	<a id="twitter" href="#" target="_blank">Twitter</a>
@@ -52,17 +72,17 @@
 </div> 
 -->
 
-<div id="helpers" class="opac">
+<!-- <div id="helpers" class="opac">
 	<button id="playstop" class="secbutton">stop</button>
 	<button id="toggleKeepOpacity" class="secbutton">keep</button>
-</div>
+</div> -->
 
-<div id="stuff" class="opac">
+<!-- <div id="stuff" class="opac">
 	copyright &copy; 2010 by <a href="http://stagas.com" target="_blank">stagas</a> -
 	<a href="stats.html" target="_blank">stats</a> |
 	<a href="suggest.html" target="_blank">suggest a station</a> |
 	<span id="ml"></span>
-</div>
+</div> -->
 
 <div id="log"></div>
 <div id="style"></div>

@@ -10,4 +10,4 @@ fork it, have fun, send pull :)
 
 installing dependencies:
 
-npm install scylla paperboy
+npm install connect meryl chaos colors
